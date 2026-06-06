@@ -1,0 +1,50 @@
+services:
+  # ☕ Spring Boot Backend Engine (Dockerized Web Service linked to Neon PostgreSQL)
+  - type: web
+    name: equinox-backend
+    env: docker
+    rootDir: equinox_backend
+    dockerfilePath: Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      # 💾 External Neon Database Credentials (Render will prompt you for these on launch)
+      - key: DB_HOST
+        placeholder: "e.g. ep-cool-breeze-123456.us-east-2.aws.neon.tech"
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_NAME
+        value: "neondb"
+      - key: DB_USERNAME
+        placeholder: "e.g. neondb_owner"
+      - key: DB_PASSWORD
+        placeholder: "Your secure Neon password"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        fromService:
+          name: equinox-frontend
+          property: host
+      - key: PORT
+        value: 8080
+
+  # 🪐 React Vite Frontend Experience (Static Site)
+  - type: web
+    name: equinox-frontend
+    env: static
+    rootDir: equinox_frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          name: equinox-backend
+          property: host
+      - key: VITE_APP_NAME
+        value: EquinoxOS
+      - key: VITE_TOKEN_KEY
+        value: eq_token
+      - key: VITE_USERNAME_KEY
+        value: eq_username
+      - key: VITE_ROLE_KEY
+        value: eq_role
