@@ -21,7 +21,7 @@ services:
         placeholder: "Your secure Neon password"
       - key: JWT_SECRET
         generateValue: true
-      - key: ALLOWED_ORIGINS
+      - key: APP_CORS_ALLOWED_ORIGINS
         fromService:
           name: equinox-frontend
           property: host
