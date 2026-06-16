@@ -27,6 +27,8 @@ services:
           property: host
       - key: PORT
         value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: "prod"
 
   # 🪐 React Vite Frontend Experience (Static Site)
   - type: web
