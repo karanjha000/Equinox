@@ -3,7 +3,8 @@
   <p>A Full-Stack Financial Management Dashboard</p>
 
   <!-- Live Demo Badge Placeholder -->
-  [![Live Demo](https://img.shields.io/badge/Demo-Live_Website-success?style=flat-square&logo=vercel)](https://finance-frontend-zeta-umber.vercel.app)
+  [![Live Demo (Render)](https://img.shields.io/badge/Demo-Render-success?style=flat-square&logo=render)](https://equinox-a4s7.onrender.com)
+  [![Live Demo (Vercel)](https://img.shields.io/badge/Demo-Vercel-success?style=flat-square&logo=vercel)](https://finance-frontend-zeta-umber.vercel.app)
   [![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.5-6DB33F?style=flat-square&logo=springboot&logoColor=white)](#)
   [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=flat-square&logo=react&logoColor=black)](#)
   [![Vite](https://img.shields.io/badge/Vite-6.0.5-646CFF?style=flat-square&logo=vite&logoColor=white)](#)

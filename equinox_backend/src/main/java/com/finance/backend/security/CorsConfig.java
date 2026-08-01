@@ -11,7 +11,7 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    @Value("${app.cors.allowed-origins:http://localhost:5173,https://finance-frontend-zeta-umber.vercel.app}")
+    @Value("${app.cors.allowed-origins:http://localhost:5173,https://finance-frontend-zeta-umber.vercel.app,https://equinox-a4s7.onrender.com}")
     private List<String> allowedOrigins;
 
     @Bean
@@ -19,7 +19,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
