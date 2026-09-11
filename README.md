@@ -35,7 +35,7 @@ PostgreSQL (Production) • H2 (Development)
 JSON Web Tokens (JWT) • Role-Based Access Control (RBAC)
 
 **Deployment**
-Vercel • Render • Neon (DB)
+Render • Neon (DB)
 
 ## Architecture
 
@@ -135,7 +135,7 @@ The frontend application will be available at `http://localhost:5173`.
 
 Equinox OS is configured for modern cloud deployment platforms:
 
-- **Frontend:** Deployed globally as a static site via **Vercel**.
+- **Frontend:** Deployed globally as a static site via **Render**.
 - **Backend:** Containerized via Docker and deployed as a web service on **Render**.
 - **Database:** Managed **PostgreSQL** database hosted on Neon.
 
@@ -143,5 +143,5 @@ The repository includes a `render.yaml` blueprint for streamlined backend deploy
 
 ### Live Links
 
-- **Application (Frontend):** [Equinox OS on Vercel](https://equinox-a4s7.onrender.com)
+- **Application (Frontend):** [Equinox OS on Render](https://equinox-a4s7.onrender.com)
 - **API (Backend):** [Equinox OS API on Render](https://finance-bbackend.onrender.com)
