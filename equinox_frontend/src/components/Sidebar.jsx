@@ -28,7 +28,7 @@ export default function Sidebar({ collapsed, onToggle }) {
         </div>
         {!collapsed && (
           <div>
-            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '1rem', color: 'var(--text-1)', lineHeight: 1.1 }}>FinanceOS</div>
+            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '1rem', color: 'var(--text-1)', lineHeight: 1.1 }}>Equinox OS</div>
             <div style={{ fontSize: '0.62rem', color: 'var(--text-3)', letterSpacing: '0.1em', marginTop: 2 }}>DASHBOARD</div>
           </div>
         )}

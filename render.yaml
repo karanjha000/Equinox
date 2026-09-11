@@ -41,7 +41,7 @@ services:
           name: equinox-backend
           property: host
       - key: VITE_APP_NAME
-        value: EquinoxOS
+        value: Equinox OS
       - key: VITE_TOKEN_KEY
         value: eq_token
       - key: VITE_USERNAME_KEY

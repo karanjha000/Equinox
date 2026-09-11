@@ -33,7 +33,7 @@ export default function DesktopSidebar({ collapsed, onToggle }) {
         </div>
         {!collapsed && (
           <div className="animate-in fade-in duration-300">
-            <div className="font-serif text-base text-[#f1f5f9] leading-none">Equinox</div>
+            <div className="font-serif text-base text-[#f1f5f9] leading-none">Equinox OS</div>
             <div className="text-[10px] text-[#475569] tracking-widest mt-1">DASHBOARD</div>
           </div>
         )}

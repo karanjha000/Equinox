@@ -12,7 +12,7 @@ public class HealthController {
     public Map<String, Object> healthCheck() {
         return Map.of(
             "status", "UP",
-            "message", "Equinox Finance Backend is running",
+            "message", "Equinox OS Backend is running",
             "timestamp", LocalDateTime.now()
         );
     }

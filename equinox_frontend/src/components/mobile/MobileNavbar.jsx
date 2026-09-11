@@ -15,7 +15,7 @@ export default function MobileNavbar({ onMenuClick }) {
           <div className="w-8 h-8 bg-[#f5a623] rounded-lg flex items-center justify-center">
             <TrendingUp size={18} className="text-[#080d1a]" strokeWidth={2.5}/>
           </div>
-          <span className="font-serif text-lg text-[#f1f5f9]">Equinox</span>
+          <span className="font-serif text-lg text-[#f1f5f9]">Equinox OS</span>
         </div>
       </div>
       

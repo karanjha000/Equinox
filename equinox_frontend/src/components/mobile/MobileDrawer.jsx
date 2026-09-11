@@ -42,7 +42,7 @@ export default function MobileDrawer({ isOpen, onClose }) {
             <div className="w-8 h-8 bg-[#f5a623] rounded-lg flex items-center justify-center">
               <Shield size={18} className="text-[#080d1a]" />
             </div>
-            <span className="font-serif text-xl text-[#f1f5f9]">Equinox</span>
+            <span className="font-serif text-xl text-[#f1f5f9]">Equinox OS</span>
           </div>
           <button onClick={onClose} className="p-2 text-[#475569] hover:text-[#f1f5f9]">
             <X size={20} />

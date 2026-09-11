@@ -1,6 +1,6 @@
-# Finance Dashboard — Frontend
+# Equinox OS — Frontend
 
-A modern, responsive finance dashboard built with React.js that connects to the Finance Backend REST API.
+A modern, responsive financial management dashboard built with React.js that connects to the Equinox OS Backend REST API.
 
 ---
 
@@ -123,7 +123,7 @@ cp .env.example .env
 
 # 5. Update .env with your values
 VITE_API_BASE_URL=http://localhost:9090
-VITE_APP_NAME=FinanceOS
+VITE_APP_NAME=Equinox OS
 VITE_TOKEN_KEY=fin_token
 VITE_USERNAME_KEY=fin_username
 VITE_ROLE_KEY=fin_role
@@ -141,7 +141,7 @@ App runs on `http://localhost:5173`
 | Variable | Description | Default |
 |---|---|---|
 | `VITE_API_BASE_URL` | Backend API base URL | http://localhost:9090 |
-| `VITE_APP_NAME` | App display name | FinanceOS |
+| `VITE_APP_NAME` | App display name | Equinox OS |
 | `VITE_TOKEN_KEY` | localStorage key for JWT | fin_token |
 | `VITE_USERNAME_KEY` | localStorage key for username | fin_username |
 | `VITE_ROLE_KEY` | localStorage key for role | fin_role |

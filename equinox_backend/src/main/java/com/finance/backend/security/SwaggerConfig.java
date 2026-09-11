@@ -15,9 +15,9 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Equinox Dashboard API")
+                        .title("Equinox OS API")
                         .version("1.0")
-                        .description("Backend API for Equinox Dashboard with JWT Auth and RBAC"))
+                        .description("Backend API for Equinox OS — Financial Asset Management Platform with JWT Auth and RBAC"))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(new Components()
                         .addSecuritySchemes("Bearer Authentication",

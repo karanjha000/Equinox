@@ -125,7 +125,7 @@ export default function UsersPage() {
       {delUser && (
         <ConfirmDialog
           title="Terminate User Access"
-          message={`Permanently remove "${delUser.username}" from the Equinox network? This action is logged and irreversible.`}
+          message={`Permanently remove "${delUser.username}" from the Equinox OS network? This action is logged and irreversible.`}
           onConfirm={handleDelete}
           onCancel={() => setDelUser(null)}
           loading={delLoading}

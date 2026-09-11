@@ -52,8 +52,8 @@ export default function LoginPage() {
           <div style={{ width: 52, height: 52, background: 'var(--gold)', borderRadius: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
             <TrendingUp size={26} color="#080d1a" strokeWidth={2.5}/>
           </div>
-          <h1 style={{ fontFamily: "'DM Serif Display',serif", fontSize: '2rem', color: 'var(--text-1)', lineHeight: 1.1 }}>FinanceOS</h1>
-          <p style={{ color: 'var(--text-3)', fontSize: 13, marginTop: 6, letterSpacing: '0.05em' }}>FINANCIAL DASHBOARD PLATFORM</p>
+          <h1 style={{ fontFamily: "'DM Serif Display',serif", fontSize: '2rem', color: 'var(--text-1)', lineHeight: 1.1 }}>Equinox OS</h1>
+          <p style={{ color: 'var(--text-3)', fontSize: 13, marginTop: 6, letterSpacing: '0.05em' }}>FINANCIAL ASSET MANAGEMENT PLATFORM</p>
         </div>
 
         <div className="card" style={{ padding: '30px 28px' }}>
