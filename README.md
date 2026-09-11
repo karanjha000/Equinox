@@ -2,8 +2,8 @@
   <h1>Equinox OS</h1>
   <p>A modern financial management platform designed to bring personal and business financial workflows into one secure, intuitive workspace.</p>
 
-  [![Live Demo (Frontend)](https://img.shields.io/badge/Demo-Frontend-success?style=flat-square&logo=vercel)](https://finance-frontend-zeta-umber.vercel.app)
-  [![Live Demo (Backend)](https://img.shields.io/badge/Demo-Backend-success?style=flat-square&logo=render)](https://equinox-a4s7.onrender.com)
+  [![Live Demo (Frontend)](https://img.shields.io/badge/Demo-Frontend-success?style=flat-square&logo=vercel)](https://equinox-a4s7.onrender.com/login)
+  [![Live Demo (Backend)](https://img.shields.io/badge/Demo-Backend-success?style=flat-square&logo=render)](https://finance-bbackend.onrender.com)
   [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](#)
 </div>
 
@@ -144,4 +144,4 @@ The repository includes a `render.yaml` blueprint for streamlined backend deploy
 ### Live Links
 
 - **Application (Frontend):** [Equinox OS on Vercel](https://equinox-a4s7.onrender.com)
-- **API (Backend):** [Equinox OS API on Render](https://equinox-a4s7.onrender.com)
+- **API (Backend):** [Equinox OS API on Render](https://finance-bbackend.onrender.com)
