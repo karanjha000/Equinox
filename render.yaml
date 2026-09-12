@@ -9,20 +9,16 @@ services:
     plan: free
     envVars:
       # 💾 External Neon Database Credentials (Render will prompt you for these on launch)
-      - key: DB_HOST
-        placeholder: "e.g. ep-cool-breeze-123456.us-east-2.aws.neon.tech"
-      - key: DB_PORT
-        value: "5432"
-      - key: DB_NAME
-        value: "neondb"
+      - key: DB_URL
+        placeholder: "e.g. jdbc:postgresql://ep-cool-breeze-123456.us-east-2.aws.neon.tech/neondb"
       - key: DB_USERNAME
-        placeholder: "e.g. neondb_owner"
+        placeholder: "Optional if included in DB_URL"
       - key: DB_PASSWORD
-        placeholder: "Your secure Neon password"
+        placeholder: "Optional if included in DB_URL"
       - key: JWT_SECRET
         generateValue: true
       - key: APP_CORS_ALLOWED_ORIGINS
-        value: "https://finance-frontend-zeta-umber.vercel.app,https://equinox-a4s7.onrender.com"
+        value: "https://equinox-a4s7.onrender.com"
       - key: PORT
         value: 8080
       - key: SPRING_PROFILES_ACTIVE
