@@ -23,7 +23,10 @@ api.interceptors.request.use(cfg => {
 api.interceptors.response.use(r => r, err => {
   if ([401, 403].includes(err.response?.status)) {
     [TOKEN_KEY, USERNAME_KEY, ROLE_KEY].forEach(k => localStorage.removeItem(k))
-    window.location.href = '/login'
+    // Prevent hard reload if we are already trying to log in
+    if (!err.config.url.includes('/api/auth/login')) {
+      window.location.href = '/login'
+    }
   }
   return Promise.reject(err)
 })
