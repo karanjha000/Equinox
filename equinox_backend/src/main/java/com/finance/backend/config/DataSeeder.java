@@ -7,6 +7,7 @@ import com.finance.backend.model.User;
 import com.finance.backend.repository.TransactionRepository;
 import com.finance.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
@@ -85,7 +87,7 @@ public class DataSeeder implements CommandLineRunner {
             }
 
             transactionRepository.saveAll(transactions);
-            System.out.println("Test data seeded successfully.");
+            log.info("Test data seeded successfully.");
         }
     }
 }

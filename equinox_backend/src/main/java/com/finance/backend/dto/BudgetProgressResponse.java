@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 public class BudgetProgressResponse {
     private Long id;
     private String category;
-    private BigDecimal limit;
+    private BigDecimal amountLimit;
     private BigDecimal spent;
     private double percentage;
 }

@@ -67,7 +67,7 @@ export default function BudgetsPage() {
   const formatCurrency = (amt) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amt)
 
   const totalBudgets = budgets.length
-  const totalLimit = budgets.reduce((acc, b) => acc + (b.limit || 0), 0)
+  const totalLimit = budgets.reduce((acc, b) => acc + (b.amountLimit || 0), 0)
   const totalSpent = budgets.reduce((acc, b) => acc + (b.spent || 0), 0)
   const exceededCount = budgets.filter(b => b.percentage >= 100).length
   const safeCount = budgets.filter(b => b.percentage < 80).length
@@ -186,7 +186,7 @@ export default function BudgetsPage() {
                       <tr key={b.id}>
                         <td className="font-semibold text-[#f1f5f9]">{b.category}</td>
                         <td className="mono text-[13px] text-[#f1f5f9]">{formatCurrency(b.spent)}</td>
-                        <td className="mono text-[13px] text-[#94a3b8]">{formatCurrency(b.limit)}</td>
+                        <td className="mono text-[13px] text-[#94a3b8]">{formatCurrency(b.amountLimit)}</td>
                         <td>
                           <div className="flex items-center gap-3">
                             <div className="flex-1 h-1.5 bg-[#1c2b42] rounded-full overflow-hidden">
@@ -209,7 +209,7 @@ export default function BudgetsPage() {
                           <div className="flex gap-2 justify-center">
                             <button 
                               className="btn btn-ghost p-2 text-[#94a3b8] hover:text-[#f1f5f9]"
-                              onClick={() => setForm({ category: b.category, amountLimit: b.limit })}
+                              onClick={() => setForm({ category: b.category, amountLimit: b.amountLimit })}
                               title="Edit Limit"
                             >
                               <Edit2 size={13}/>

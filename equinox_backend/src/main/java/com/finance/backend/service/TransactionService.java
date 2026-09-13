@@ -82,37 +82,7 @@ public class TransactionService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending().and(Sort.by("createdAt").descending()));
 
-        Specification<Transaction> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-
-            // Always exclude soft-deleted records
-            predicates.add(cb.equal(root.get("deleted"), false));
-
-            // User isolation: non-admin users only see their own transactions
-            if (user.getRole() != Role.ADMIN) {
-                predicates.add(cb.equal(root.get("createdBy").get("id"), user.getId()));
-            }
-
-            // Optional type filter
-            if (type != null) {
-                predicates.add(cb.equal(root.get("type"), type));
-            }
-
-            // Optional category filter
-            if (category != null && !category.isBlank()) {
-                predicates.add(cb.equal(root.get("category"), category));
-            }
-
-            // Optional date range filters
-            if (startDate != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("date"), startDate));
-            }
-            if (endDate != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("date"), endDate));
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<Transaction> spec = createTransactionSpecification(type, category, startDate, endDate, user);
 
         return transactionRepository.findAll(spec, pageable).map(this::mapToResponse);
     }
@@ -200,37 +170,7 @@ public class TransactionService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Specification<Transaction> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-
-            // Always exclude soft-deleted records
-            predicates.add(cb.equal(root.get("deleted"), false));
-
-            // User isolation: non-admin users only see their own transactions
-            if (user.getRole() != Role.ADMIN) {
-                predicates.add(cb.equal(root.get("createdBy").get("id"), user.getId()));
-            }
-
-            // Optional type filter
-            if (type != null) {
-                predicates.add(cb.equal(root.get("type"), type));
-            }
-
-            // Optional category filter
-            if (category != null && !category.isBlank()) {
-                predicates.add(cb.equal(root.get("category"), category));
-            }
-
-            // Optional date range filters
-            if (startDate != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("date"), startDate));
-            }
-            if (endDate != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("date"), endDate));
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<Transaction> spec = createTransactionSpecification(type, category, startDate, endDate, user);
 
         List<Transaction> transactions = transactionRepository.findAll(spec, Sort.by("date").descending().and(Sort.by("createdAt").descending()));
 
@@ -261,6 +201,30 @@ public class TransactionService {
             return "\"" + escaped + "\"";
         }
         return escaped;
+    }
+
+    private Specification<Transaction> createTransactionSpecification(
+            TransactionType type, String category, LocalDate startDate, LocalDate endDate, User user) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("deleted"), false));
+            if (user.getRole() != Role.ADMIN) {
+                predicates.add(cb.equal(root.get("createdBy").get("id"), user.getId()));
+            }
+            if (type != null) {
+                predicates.add(cb.equal(root.get("type"), type));
+            }
+            if (category != null && !category.isBlank()) {
+                predicates.add(cb.equal(root.get("category"), category));
+            }
+            if (startDate != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("date"), startDate));
+            }
+            if (endDate != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("date"), endDate));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     public TransactionResponse mapToResponse(Transaction t) {
