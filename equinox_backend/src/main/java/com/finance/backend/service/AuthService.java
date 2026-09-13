@@ -50,6 +50,10 @@ public class AuthService {
                 User user = userRepository.findByUsername(request.getUsername())
                         .orElseThrow(() -> new RuntimeException("User not found"));
 
+                if (!user.isActive()) {
+                    throw new RuntimeException("Your account is deactivated. Please contact an admin.");
+                }
+
                 String token = jwtUtil.generateToken(user.getUsername(),user.getRole().name());
 
                 return new AuthResponse(token, user.getUsername(), user.getRole().name());
