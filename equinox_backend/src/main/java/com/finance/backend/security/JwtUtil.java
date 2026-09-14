@@ -4,14 +4,29 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 import java.security.Key;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
- @Value("${jwt.secret:equinox_secret_key_must_be_32_chars!!}")
+ @Value("${jwt.secret:#{null}}")
  private String secret;
+
+ @PostConstruct
+ public void init() {
+  if (secret == null || secret.isBlank()) {
+   byte[] keyBytes = new byte[32];
+   new SecureRandom().nextBytes(keyBytes);
+   secret = Base64.getEncoder().encodeToString(keyBytes);
+   log.warn("No jwt.secret configured. Generating a random key for this session. THIS IS UNSAFE FOR PRODUCTION!");
+  }
+ }
 
  @Value("${jwt.expiration:86400000}")
  private long expiration;
