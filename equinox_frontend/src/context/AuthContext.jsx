@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react'
+import { authAPI } from '../services/api'
 
 const TOKEN_KEY = import.meta.env.VITE_TOKEN_KEY || 'fin_token'
 const USERNAME_KEY = import.meta.env.VITE_USERNAME_KEY || 'fin_username'
@@ -18,9 +19,15 @@ export function AuthProvider({ children }) {
     localStorage.setItem(ROLE_KEY, role)
     setAuth({ token, username, role })
   }, [])
-  const logout = useCallback(() => {
-    [TOKEN_KEY, USERNAME_KEY, ROLE_KEY].forEach(k => localStorage.removeItem(k))
-    setAuth(null)
+  const logout = useCallback(async () => {
+    try {
+      if (localStorage.getItem(TOKEN_KEY)) {
+        await authAPI.logout().catch(e => console.error("Logout request failed", e))
+      }
+    } finally {
+      [TOKEN_KEY, USERNAME_KEY, ROLE_KEY].forEach(k => localStorage.removeItem(k))
+      setAuth(null)
+    }
   }, [])
   return (
     <Ctx.Provider value={{

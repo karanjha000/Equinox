@@ -34,6 +34,7 @@ api.interceptors.response.use(r => r, err => {
 export const authAPI = {
   login: d => api.post('/api/auth/login', d),
   register: d => api.post('/api/auth/register', d),
+  logout: () => api.post('/api/auth/logout'),
 }
 
 export const txAPI = {

@@ -7,7 +7,10 @@ import com.finance.backend.dto.UserResponse;
 import com.finance.backend.enums.Role;
 import com.finance.backend.model.User;
 import com.finance.backend.repository.UserRepository;
+import com.finance.backend.repository.RevokedTokenRepository;
+import com.finance.backend.model.RevokedToken;
 import com.finance.backend.security.JwtUtil;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final RevokedTokenRepository revokedTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
@@ -60,6 +64,14 @@ public class AuthService {
 
     }
 
+    public void logout(String token) {
+        if (!revokedTokenRepository.existsByToken(token)) {
+            RevokedToken revokedToken = new RevokedToken();
+            revokedToken.setToken(token);
+            revokedToken.setRevokedAt(new Date());
+            revokedTokenRepository.save(revokedToken);
+        }
+    }
 
     public UserResponse mapToResponse(User user){
         UserResponse userResponse = new UserResponse();
