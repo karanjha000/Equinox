@@ -8,9 +8,11 @@ import com.finance.backend.repository.TransactionRepository;
 import com.finance.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import java.util.UUID;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,12 +29,26 @@ public class DataSeeder implements CommandLineRunner {
     private final TransactionRepository transactionRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${admin.default.password:#{null}}")
+    private String defaultAdminPassword;
+
     @Override
     public void run(String... args) throws Exception {
         if (userRepository.count() == 0) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("admin123"));
+            
+            String passwordToUse = defaultAdminPassword;
+            if (passwordToUse == null || passwordToUse.isBlank()) {
+                passwordToUse = UUID.randomUUID().toString().substring(0, 10);
+                log.warn("=========================================================");
+                log.warn("NO ADMIN PASSWORD CONFIGURED (admin.default.password)!");
+                log.warn("Default Admin account created with password: {}", passwordToUse);
+                log.warn("PLEASE LOG IN AND CHANGE IT IMMEDIATELY.");
+                log.warn("=========================================================");
+            }
+            
+            admin.setPassword(passwordEncoder.encode(passwordToUse));
             admin.setEmail("admin@equinox.com");
             admin.setRole(Role.ADMIN);
             admin.setActive(true);
