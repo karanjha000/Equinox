@@ -43,21 +43,7 @@ public class TransactionService {
         return mapToResponse(transactionRepository.save(transaction));
     }
 
-    public List<TransactionResponse> getAll(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<Transaction> transactions;
-        if (user.getRole() == com.finance.backend.enums.Role.ADMIN) {
-            transactions = transactionRepository.findAllByDeletedFalse();
-        } else {
-            transactions = transactionRepository.findByCreatedByIdAndDeletedFalse(user.getId());
-        }
-
-        return transactions.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
 
     public TransactionResponse getById(Long id, String username) {
         User user = userRepository.findByUsername(username)
