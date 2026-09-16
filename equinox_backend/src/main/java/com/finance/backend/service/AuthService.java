@@ -80,15 +80,16 @@ public class AuthService {
     }
 
     public void forgotPassword(String email) {
-        userRepository.findByEmail(email).ifPresent(user -> {
-            String token = UUID.randomUUID().toString();
-            PasswordResetToken resetToken = new PasswordResetToken();
-            resetToken.setToken(token);
-            resetToken.setUser(user);
-            resetToken.setExpiryDate(new Date(System.currentTimeMillis() + 15 * 60 * 1000));
-            passwordResetTokenRepository.save(resetToken);
-            emailService.sendPasswordResetEmail(user.getEmail(), token);
-        });
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("No account found with that email address."));
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setUser(user);
+        resetToken.setExpiryDate(new Date(System.currentTimeMillis() + 15 * 60 * 1000));
+        passwordResetTokenRepository.save(resetToken);
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
     }
 
     @Transactional
