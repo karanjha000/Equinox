@@ -18,8 +18,9 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String ipAddress = getClientIP(request);
+        String action = request.getRequestURI().contains("forgot-password") ? "forgot-password" : "auth";
         
-        Bucket tokenBucket = rateLimitingService.resolveBucket(ipAddress);
+        Bucket tokenBucket = rateLimitingService.resolveBucket(ipAddress, action);
         ConsumptionProbe probe = tokenBucket.tryConsumeAndReturnRemaining(1);
         
         if (probe.isConsumed()) {
