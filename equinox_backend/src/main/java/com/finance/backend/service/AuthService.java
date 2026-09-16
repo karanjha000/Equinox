@@ -46,10 +46,10 @@ public class AuthService {
         // Generate 6 digit OTP
         String otp = String.format("%06d", new Random().nextInt(999999));
         
-        // Remove any existing OTP for this email
-        registrationOtpRepository.deleteByEmail(email);
-        
-        RegistrationOtp registrationOtp = new RegistrationOtp();
+        // Fetch existing or create new to avoid Hibernate insert-before-delete unique constraint violation
+        RegistrationOtp registrationOtp = registrationOtpRepository.findByEmail(email)
+                .orElse(new RegistrationOtp());
+                
         registrationOtp.setEmail(email);
         registrationOtp.setOtp(otp);
         registrationOtp.setExpiryDate(new Date(System.currentTimeMillis() + 2 * 60 * 1000)); // 2 minutes
