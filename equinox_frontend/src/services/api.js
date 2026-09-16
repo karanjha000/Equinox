@@ -35,6 +35,8 @@ export const authAPI = {
   login: d => api.post('/api/auth/login', d),
   register: d => api.post('/api/auth/register', d),
   logout: () => api.post('/api/auth/logout'),
+  forgotPassword: email => api.post('/api/auth/forgot-password', { email }),
+  resetPassword: (token, newPassword) => api.post('/api/auth/reset-password', { token, newPassword }),
 }
 
 export const txAPI = {

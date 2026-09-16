@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { TrendingUp, Eye, EyeOff } from 'lucide-react'
 import { authAPI } from '../services/api'
 import { useAuth } from '../context/AuthContext'
@@ -78,7 +78,12 @@ export default function LoginPage() {
               </div>
             )}
             <div>
-              <label className="label">Password</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label className="label" style={{ marginBottom: 0 }}>Password</label>
+                {tab === 'login' && (
+                  <Link to="/forgot-password" style={{ fontSize: 12, color: 'var(--gold)', textDecoration: 'none', marginBottom: 6 }}>Forgot Password?</Link>
+                )}
+              </div>
               <div style={{ position: 'relative' }}>
                 <input className="input" type={showPw ? 'text' : 'password'} placeholder="••••••••" value={form.password} onChange={e => set('password', e.target.value)} onKeyDown={e => e.key === 'Enter' && tab === 'login' && handleLogin()} style={{ paddingRight: 44 }}/>
                 <button onClick={() => setShowPw(s => !s)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', display: 'flex' }}>

@@ -8,9 +8,13 @@ import com.finance.backend.enums.Role;
 import com.finance.backend.model.User;
 import com.finance.backend.repository.UserRepository;
 import com.finance.backend.repository.RevokedTokenRepository;
+import com.finance.backend.repository.PasswordResetTokenRepository;
 import com.finance.backend.model.RevokedToken;
+import com.finance.backend.model.PasswordResetToken;
 import com.finance.backend.security.JwtUtil;
 import java.util.Date;
+import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +27,8 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final RevokedTokenRepository revokedTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
@@ -71,6 +77,35 @@ public class AuthService {
             revokedToken.setRevokedAt(new Date());
             revokedTokenRepository.save(revokedToken);
         }
+    }
+
+    public void forgotPassword(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            PasswordResetToken resetToken = new PasswordResetToken();
+            resetToken.setToken(token);
+            resetToken.setUser(user);
+            resetToken.setExpiryDate(new Date(System.currentTimeMillis() + 15 * 60 * 1000));
+            passwordResetTokenRepository.save(resetToken);
+            emailService.sendPasswordResetEmail(user.getEmail(), token);
+        });
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid password reset token"));
+
+        if (resetToken.getExpiryDate().before(new Date())) {
+            passwordResetTokenRepository.delete(resetToken);
+            throw new RuntimeException("Password reset token has expired");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        passwordResetTokenRepository.deleteByUser(user);
     }
 
     public UserResponse mapToResponse(User user){
