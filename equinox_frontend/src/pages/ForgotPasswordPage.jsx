@@ -23,73 +23,76 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0f16] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-[#0f172a] rounded-2xl p-8 border border-[#1c2b42] shadow-2xl relative overflow-hidden">
-        {/* Glow effect */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent opacity-50" />
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', position: 'relative', overflow: 'hidden' }}>
+      {/* BG decoration */}
+      <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '50vw', height: '50vw', background: 'radial-gradient(circle, rgba(245,166,35,0.06) 0%, transparent 70%)', pointerEvents: 'none' }}/>
+      
+      <div className="fade-up" style={{ width: '100%', maxWidth: 420, padding: '0 20px' }}>
         
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-[#f8fafc] tracking-tight mb-2">Reset Password</h1>
-          <p className="text-[#94a3b8] text-sm">
-            Enter your email address and we'll send you a link to reset your password.
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <h1 style={{ fontFamily: "'DM Serif Display',serif", fontSize: '2rem', color: 'var(--text-1)', lineHeight: 1.1 }}>Reset Password</h1>
+          <p style={{ color: 'var(--text-3)', fontSize: 13, marginTop: 6, letterSpacing: '0.05em' }}>
+            Enter your email address to receive a reset link.
           </p>
         </div>
 
-        {status === 'success' ? (
-          <div className="bg-[#1c2b42]/50 border border-[#22c55e]/20 rounded-xl p-6 text-center">
-            <CheckCircle2 className="w-12 h-12 text-[#22c55e] mx-auto mb-4" />
-            <h3 className="text-[#f8fafc] font-medium mb-2">Check your email</h3>
-            <p className="text-[#94a3b8] text-sm mb-6">
-              If an account exists for {email}, you will receive a password reset link shortly.
-            </p>
-            <Link to="/login" className="btn btn-primary w-full justify-center text-sm font-medium">
-              Return to Login
-            </Link>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#cbd5e1] ml-1">Email Address</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Mail className="h-4 w-4 text-[#64748b]" />
-                </div>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  disabled={status === 'loading'}
-                  className="input input-bordered w-full pl-10 bg-[#0a0f16] border-[#1c2b42] text-[#f8fafc] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/50 transition-all placeholder:text-[#475569]"
-                  placeholder="name@company.com"
-                />
+        <div className="card" style={{ padding: '30px 28px' }}>
+          {status === 'success' ? (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+                <CheckCircle2 size={48} color="#22c55e" />
               </div>
+              <h3 style={{ color: 'var(--text-1)', marginBottom: 8 }}>Check your email</h3>
+              <p style={{ color: 'var(--text-3)', fontSize: 13, marginBottom: 24 }}>
+                If an account exists for {email}, you will receive a password reset link shortly.
+              </p>
+              <Link to="/login" className="btn btn-gold" style={{ display: 'block', width: '100%', textAlign: 'center', boxSizing: 'border-box' }}>
+                Return to Login
+              </Link>
             </div>
-
-            {status === 'error' && (
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-[#ef4444]/10 border border-[#ef4444]/20 text-[#ef4444] text-sm">
-                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>{errorMsg}</span>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 14 }}>
+              <div>
+                <label className="label">Email Address</label>
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', display: 'flex', pointerEvents: 'none' }}>
+                    <Mail size={16} color="var(--text-3)" />
+                  </div>
+                  <input
+                    className="input"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    disabled={status === 'loading'}
+                    placeholder="name@company.com"
+                    style={{ paddingLeft: 38, width: '100%', boxSizing: 'border-box' }}
+                  />
+                </div>
               </div>
-            )}
 
-            <button 
-              type="submit" 
-              disabled={status === 'loading' || !email}
-              className="btn btn-primary w-full justify-center text-sm font-medium relative overflow-hidden group"
-            >
-              {status === 'loading' ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <span className="relative z-10">Send Reset Link</span>
+              {status === 'error' && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: 12, borderRadius: 8, background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', fontSize: 13 }}>
+                  <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span>{errorMsg}</span>
+                </div>
               )}
-            </button>
-          </form>
-        )}
 
-        <div className="mt-6 text-center">
-          <Link to="/login" className="inline-flex items-center gap-2 text-sm text-[#94a3b8] hover:text-[#f8fafc] transition-colors">
-            <ArrowLeft className="w-4 h-4" />
+              <button 
+                type="submit" 
+                disabled={status === 'loading' || !email}
+                className="btn btn-gold" 
+                style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}
+              >
+                {status === 'loading' ? <><span className="spinner"/> Sending...</> : 'Send Reset Link'}
+              </button>
+            </form>
+          )}
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <Link to="/login" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-3)', textDecoration: 'none', transition: 'color 0.2s' }}>
+            <ArrowLeft size={16} />
             Back to login
           </Link>
         </div>

@@ -41,89 +41,100 @@ export default function ResetPasswordPage() {
 
   if (status === 'invalid_token') {
     return (
-      <div className="min-h-screen bg-[#0a0f16] flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-[#0f172a] rounded-2xl p-8 border border-[#1c2b42] shadow-2xl text-center">
-          <AlertCircle className="w-12 h-12 text-[#ef4444] mx-auto mb-4" />
-          <h1 className="text-xl font-bold text-[#f8fafc] mb-2">Invalid Reset Link</h1>
-          <p className="text-[#94a3b8] text-sm mb-6">The password reset link is invalid or missing the token.</p>
-          <Link to="/forgot-password" className="btn btn-primary w-full justify-center">Request New Link</Link>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', position: 'relative', overflow: 'hidden' }}>
+        <div className="fade-up card" style={{ width: '100%', maxWidth: 420, padding: '30px 28px', textAlign: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+            <AlertCircle size={48} color="#ef4444" />
+          </div>
+          <h1 style={{ fontFamily: "'DM Serif Display',serif", fontSize: '1.5rem', color: 'var(--text-1)', marginBottom: 8 }}>Invalid Reset Link</h1>
+          <p style={{ color: 'var(--text-3)', fontSize: 13, marginBottom: 24 }}>The password reset link is invalid or missing the token.</p>
+          <Link to="/forgot-password" className="btn btn-gold" style={{ display: 'block', width: '100%', textAlign: 'center', boxSizing: 'border-box' }}>Request New Link</Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0f16] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-[#0f172a] rounded-2xl p-8 border border-[#1c2b42] shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent opacity-50" />
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', position: 'relative', overflow: 'hidden' }}>
+      {/* BG decoration */}
+      <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '50vw', height: '50vw', background: 'radial-gradient(circle, rgba(245,166,35,0.06) 0%, transparent 70%)', pointerEvents: 'none' }}/>
+      
+      <div className="fade-up" style={{ width: '100%', maxWidth: 420, padding: '0 20px' }}>
         
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-[#f8fafc] tracking-tight mb-2">Set New Password</h1>
-          <p className="text-[#94a3b8] text-sm">Please enter your new password below.</p>
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <h1 style={{ fontFamily: "'DM Serif Display',serif", fontSize: '2rem', color: 'var(--text-1)', lineHeight: 1.1 }}>Set New Password</h1>
+          <p style={{ color: 'var(--text-3)', fontSize: 13, marginTop: 6, letterSpacing: '0.05em' }}>Please enter your new password below.</p>
         </div>
 
-        {status === 'success' ? (
-          <div className="bg-[#1c2b42]/50 border border-[#22c55e]/20 rounded-xl p-6 text-center">
-            <CheckCircle2 className="w-12 h-12 text-[#22c55e] mx-auto mb-4" />
-            <h3 className="text-[#f8fafc] font-medium mb-2">Password Updated!</h3>
-            <p className="text-[#94a3b8] text-sm mb-6">
-              Your password has been changed successfully. Redirecting to login...
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#cbd5e1] ml-1">New Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 text-[#64748b]" />
-                </div>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  disabled={status === 'loading'}
-                  className="input input-bordered w-full pl-10 bg-[#0a0f16] border-[#1c2b42] text-[#f8fafc]"
-                  placeholder="••••••••"
-                />
+        <div className="card" style={{ padding: '30px 28px' }}>
+          {status === 'success' ? (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+                <CheckCircle2 size={48} color="#22c55e" />
               </div>
+              <h3 style={{ color: 'var(--text-1)', marginBottom: 8 }}>Password Updated!</h3>
+              <p style={{ color: 'var(--text-3)', fontSize: 13 }}>
+                Your password has been changed successfully. Redirecting to login...
+              </p>
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#cbd5e1] ml-1">Confirm New Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 text-[#64748b]" />
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 14 }}>
+              <div>
+                <label className="label">New Password</label>
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', display: 'flex', pointerEvents: 'none' }}>
+                    <Lock size={16} color="var(--text-3)" />
+                  </div>
+                  <input
+                    className="input"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    disabled={status === 'loading'}
+                    placeholder="••••••••"
+                    style={{ paddingLeft: 38, width: '100%', boxSizing: 'border-box' }}
+                  />
                 </div>
-                <input
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={e => setConfirmPassword(e.target.value)}
-                  disabled={status === 'loading'}
-                  className="input input-bordered w-full pl-10 bg-[#0a0f16] border-[#1c2b42] text-[#f8fafc]"
-                  placeholder="••••••••"
-                />
               </div>
-            </div>
 
-            {status === 'error' && (
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-[#ef4444]/10 border border-[#ef4444]/20 text-[#ef4444] text-sm">
-                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>{errorMsg}</span>
+              <div>
+                <label className="label">Confirm New Password</label>
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', display: 'flex', pointerEvents: 'none' }}>
+                    <Lock size={16} color="var(--text-3)" />
+                  </div>
+                  <input
+                    className="input"
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    disabled={status === 'loading'}
+                    placeholder="••••••••"
+                    style={{ paddingLeft: 38, width: '100%', boxSizing: 'border-box' }}
+                  />
+                </div>
               </div>
-            )}
 
-            <button 
-              type="submit" 
-              disabled={status === 'loading' || !password || !confirmPassword}
-              className="btn btn-primary w-full justify-center mt-2"
-            >
-              {status === 'loading' ? <Loader2 className="w-5 h-5 animate-spin" /> : "Reset Password"}
-            </button>
-          </form>
-        )}
+              {status === 'error' && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: 12, borderRadius: 8, background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', fontSize: 13 }}>
+                  <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span>{errorMsg}</span>
+                </div>
+              )}
+
+              <button 
+                type="submit" 
+                disabled={status === 'loading' || !password || !confirmPassword}
+                className="btn btn-gold" 
+                style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}
+              >
+                {status === 'loading' ? <><span className="spinner"/> Processing...</> : "Reset Password"}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   )
