@@ -9,11 +9,14 @@ import com.finance.backend.model.User;
 import com.finance.backend.repository.UserRepository;
 import com.finance.backend.repository.RevokedTokenRepository;
 import com.finance.backend.repository.PasswordResetTokenRepository;
+import com.finance.backend.repository.RegistrationOtpRepository;
 import com.finance.backend.model.RevokedToken;
 import com.finance.backend.model.PasswordResetToken;
+import com.finance.backend.model.RegistrationOtp;
 import com.finance.backend.security.JwtUtil;
 import java.util.Date;
 import java.util.UUID;
+import java.util.Random;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,17 +31,52 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RevokedTokenRepository revokedTokenRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final RegistrationOtpRepository registrationOtpRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
+    @Transactional
+    public void sendRegistrationOtp(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email already exists");
+        }
+        
+        // Generate 6 digit OTP
+        String otp = String.format("%06d", new Random().nextInt(999999));
+        
+        // Remove any existing OTP for this email
+        registrationOtpRepository.deleteByEmail(email);
+        
+        RegistrationOtp registrationOtp = new RegistrationOtp();
+        registrationOtp.setEmail(email);
+        registrationOtp.setOtp(otp);
+        registrationOtp.setExpiryDate(new Date(System.currentTimeMillis() + 2 * 60 * 1000)); // 2 minutes
+        
+        registrationOtpRepository.save(registrationOtp);
+        emailService.sendRegistrationOtpEmail(email, otp);
+    }
+
+    @Transactional
     public UserResponse register(RegisterRequest request){
         if (userRepository.existsByUsername(request.getUsername())){
             throw new RuntimeException("Username already exists");
         }
         if (userRepository.existsByEmail(request.getEmail())){
             throw new RuntimeException("Email already exists");
+        }
+
+        RegistrationOtp registrationOtp = registrationOtpRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("No OTP requested for this email"));
+                
+        if (registrationOtp.getExpiryDate().before(new Date())) {
+            registrationOtpRepository.delete(registrationOtp);
+            throw new RuntimeException("OTP has expired. Please request a new one.");
+        }
+        
+        if (!registrationOtp.getOtp().equals(request.getOtp())) {
+            throw new RuntimeException("Invalid OTP");
         }
 
         User user = new User();
@@ -49,6 +87,10 @@ public class AuthService {
         user.setActive(true);
 
         User saved = userRepository.save(user);
+        
+        // Clean up OTP
+        registrationOtpRepository.delete(registrationOtp);
+        
         return mapToResponse(saved);
     }
 

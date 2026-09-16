@@ -52,12 +52,53 @@ public class EmailService {
             helper.setTo(toEmail);
             helper.setSubject("Equinox OS - Password Reset");
             helper.setText(htmlMessage, true);
-            helper.setFrom(new InternetAddress("no-reply@equinoxos.com", "Equinox OS"));
+            
+            // Mask sender and fix avatar overlap by padding the personal name and adding Reply-To
+            helper.setFrom(new InternetAddress("no-reply@equinoxos.com", "Equinox OS \u200C"));
+            helper.setReplyTo("no-reply@equinoxos.com");
             
             mailSender.send(mimeMessage);
             log.info("Password reset HTML email sent securely to {}", toEmail);
         } catch (Exception e) {
             log.error("Failed to send password reset email to {}: {}", toEmail, e.getMessage());
+        }
+    }
+
+    public void sendRegistrationOtpEmail(String toEmail, String otp) {
+        String htmlMessage = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;\">"
+                + "<h2 style=\"color: #080d1a;\">Verify your Email Address</h2>"
+                + "<p>Hello,</p>"
+                + "<p>Thank you for registering with <strong>Equinox OS</strong>! Please use the following 6-digit verification code to complete your registration.</p>"
+                + "<div style=\"text-align: center; margin: 30px 0;\">"
+                + "<span style=\"display: inline-block; background-color: #f1f5f9; color: #0f172a; padding: 16px 32px; border-radius: 8px; font-size: 28px; font-weight: bold; letter-spacing: 4px; border: 2px dashed #94a3b8;\">" + otp + "</span>"
+                + "</div>"
+                + "<p>This code is valid for <strong>2 minutes</strong>. If you did not request this code, you can safely ignore this email.</p>"
+                + "<p>Best regards,<br/>The Equinox OS Team</p>"
+                + "</div>";
+
+        if (mailHost == null || mailHost.isBlank()) {
+            log.warn("==========================================================================");
+            log.warn("SMTP credentials not configured! OTP Email was NOT sent.");
+            log.warn("Registration OTP for {}: {}", toEmail, otp);
+            log.warn("==========================================================================");
+            return;
+        }
+
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            
+            helper.setTo(toEmail);
+            helper.setSubject("Equinox OS - Verification Code");
+            helper.setText(htmlMessage, true);
+            
+            helper.setFrom(new InternetAddress("no-reply@equinoxos.com", "Equinox OS \u200C"));
+            helper.setReplyTo("no-reply@equinoxos.com");
+            
+            mailSender.send(mimeMessage);
+            log.info("Registration OTP email sent securely to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send registration OTP email to {}: {}", toEmail, e.getMessage());
         }
     }
 }

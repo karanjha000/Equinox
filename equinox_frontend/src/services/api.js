@@ -33,6 +33,7 @@ api.interceptors.response.use(r => r, err => {
 
 export const authAPI = {
   login: d => api.post('/api/auth/login', d),
+  sendOtp: email => api.post('/api/auth/register/send-otp', { email }),
   register: d => api.post('/api/auth/register', d),
   logout: () => api.post('/api/auth/logout'),
   forgotPassword: email => api.post('/api/auth/forgot-password', { email }),

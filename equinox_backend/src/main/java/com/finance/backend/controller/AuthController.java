@@ -14,6 +14,12 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/register/send-otp")
+    public ResponseEntity<?> sendOtp(@Valid @RequestBody SendOtpRequest request) {
+        authService.sendRegistrationOtp(request.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody
                                                  RegisterRequest request){

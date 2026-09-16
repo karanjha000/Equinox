@@ -7,7 +7,8 @@ import { useToast } from '../context/ToastContext'
 
 export default function LoginPage() {
   const [tab, setTab] = useState('login')
-  const [form, setForm] = useState({ username: '', password: '', email: '' })
+  const [step, setStep] = useState(1) // 1 = details, 2 = otp (for registration)
+  const [form, setForm] = useState({ username: '', password: '', email: '', otp: '' })
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
@@ -28,16 +29,35 @@ export default function LoginPage() {
     } finally { setLoading(false) }
   }
 
-  const handleRegister = async () => {
+  const handleSendOtp = async () => {
     if (!form.username || !form.password || !form.email) return show('Fill in all fields', 'error')
     setLoading(true)
     try {
-      await authAPI.register({ username: form.username, password: form.password, email: form.email })
+      await authAPI.sendOtp(form.email)
+      show('OTP sent to your email! (Valid for 2 minutes)', 'success')
+      setStep(2)
+    } catch (e) {
+      show(e.response?.data?.message || 'Failed to send OTP', 'error')
+    } finally { setLoading(false) }
+  }
+
+  const handleRegister = async () => {
+    if (!form.username || !form.password || !form.email || !form.otp) return show('Fill in all fields', 'error')
+    setLoading(true)
+    try {
+      await authAPI.register({ username: form.username, password: form.password, email: form.email, otp: form.otp })
       show('Account created! Please login.', 'success')
       setTab('login')
+      setStep(1)
+      setForm({ username: '', password: '', email: '', otp: '' })
     } catch (e) {
-      show(e.response?.data?.message || 'Registration failed', 'error')
+      show(e.response?.data?.message || 'Registration failed. OTP may be invalid or expired.', 'error')
     } finally { setLoading(false) }
+  }
+
+  const switchTab = (t) => {
+    setTab(t)
+    setStep(1)
   }
 
   return (
@@ -60,40 +80,56 @@ export default function LoginPage() {
           {/* Tabs */}
           <div style={{ display: 'flex', background: 'var(--bg-secondary)', borderRadius: 10, padding: 4, marginBottom: 26 }}>
             {['login','register'].map(t => (
-              <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: '8px', border: 'none', borderRadius: 8, cursor: 'pointer', fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 13, transition: 'all 0.18s', textTransform: 'capitalize', background: tab === t ? 'var(--bg-card)' : 'transparent', color: tab === t ? 'var(--text-1)' : 'var(--text-3)', boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.3)' : 'none' }}>
+              <button key={t} onClick={() => switchTab(t)} style={{ flex: 1, padding: '8px', border: 'none', borderRadius: 8, cursor: 'pointer', fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 13, transition: 'all 0.18s', textTransform: 'capitalize', background: tab === t ? 'var(--bg-card)' : 'transparent', color: tab === t ? 'var(--text-1)' : 'var(--text-3)', boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.3)' : 'none' }}>
                 {t}
               </button>
             ))}
           </div>
 
           <div style={{ display: 'grid', gap: 14 }}>
-            <div>
-              <label className="label">Username</label>
-              <input className="input" placeholder="your_username" value={form.username} onChange={e => set('username', e.target.value)} onKeyDown={e => e.key === 'Enter' && tab === 'login' && handleLogin()}/>
-            </div>
-            {tab === 'register' && (
+            {tab === 'register' && step === 2 ? (
               <div>
-                <label className="label">Email</label>
-                <input className="input" type="email" placeholder="you@example.com" value={form.email} onChange={e => set('email', e.target.value)}/>
+                <label className="label">Enter 6-Digit OTP</label>
+                <input className="input" placeholder="000000" maxLength={6} value={form.otp} onChange={e => set('otp', e.target.value)} onKeyDown={e => e.key === 'Enter' && handleRegister()}/>
+                <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 8 }}>We sent a verification code to {form.email}.</p>
+                <button onClick={() => setStep(1)} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: 12, cursor: 'pointer', marginTop: 4, padding: 0 }}>Edit details / Resend</button>
               </div>
-            )}
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label className="label" style={{ marginBottom: 0 }}>Password</label>
-                {tab === 'login' && (
-                  <Link to="/forgot-password" style={{ fontSize: 12, color: 'var(--gold)', textDecoration: 'none', marginBottom: 6 }}>Forgot Password?</Link>
+            ) : (
+              <>
+                <div>
+                  <label className="label">Username</label>
+                  <input className="input" placeholder="your_username" value={form.username} onChange={e => set('username', e.target.value)} onKeyDown={e => e.key === 'Enter' && tab === 'login' && handleLogin()}/>
+                </div>
+                {tab === 'register' && (
+                  <div>
+                    <label className="label">Email</label>
+                    <input className="input" type="email" placeholder="you@example.com" value={form.email} onChange={e => set('email', e.target.value)}/>
+                  </div>
                 )}
-              </div>
-              <div style={{ position: 'relative' }}>
-                <input className="input" type={showPw ? 'text' : 'password'} placeholder="••••••••" value={form.password} onChange={e => set('password', e.target.value)} onKeyDown={e => e.key === 'Enter' && tab === 'login' && handleLogin()} style={{ paddingRight: 44 }}/>
-                <button onClick={() => setShowPw(s => !s)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', display: 'flex' }}>
-                  {showPw ? <EyeOff size={16}/> : <Eye size={16}/>}
-                </button>
-              </div>
-            </div>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label className="label" style={{ marginBottom: 0 }}>Password</label>
+                    {tab === 'login' && (
+                      <Link to="/forgot-password" style={{ fontSize: 12, color: 'var(--gold)', textDecoration: 'none', marginBottom: 6 }}>Forgot Password?</Link>
+                    )}
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <input className="input" type={showPw ? 'text' : 'password'} placeholder="••••••••" value={form.password} onChange={e => set('password', e.target.value)} onKeyDown={e => e.key === 'Enter' && tab === 'login' && handleLogin()} style={{ paddingRight: 44 }}/>
+                    <button onClick={() => setShowPw(s => !s)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', display: 'flex' }}>
+                      {showPw ? <EyeOff size={16}/> : <Eye size={16}/>}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+            
             <button className="btn btn-gold" style={{ width: '100%', justifyContent: 'center', marginTop: 4 }}
-              onClick={tab === 'login' ? handleLogin : handleRegister} disabled={loading}>
-              {loading ? <><span className="spinner"/>{tab === 'login' ? 'Signing in…' : 'Creating account…'}</> : (tab === 'login' ? 'Sign In' : 'Create Account')}
+              onClick={tab === 'login' ? handleLogin : (step === 1 ? handleSendOtp : handleRegister)} disabled={loading}>
+              {loading ? (
+                <><span className="spinner"/>{tab === 'login' ? 'Signing in…' : (step === 1 ? 'Sending OTP…' : 'Creating account…')}</>
+              ) : (
+                tab === 'login' ? 'Sign In' : (step === 1 ? 'Verify Email' : 'Complete Registration')
+              )}
             </button>
           </div>
         </div>
