@@ -1,27 +1,67 @@
 package com.finance.backend.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
-
-    @Value("${spring.mail.host:#{null}}")
-    private String mailHost;
-
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
+
+    @Value("${brevo.api.key:}")
+    private String brevoApiKey;
+
+    @Value("${brevo.sender.email:noreply.equinox@gmail.com}")
+    private String senderEmail;
+
+    @Value("${brevo.sender.name:Equinox OS}")
+    private String senderName;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+    private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
+
+    private void sendBrevoEmail(String toEmail, String subject, String htmlContent) {
+        if (brevoApiKey == null || brevoApiKey.isBlank()) {
+            log.warn("==========================================================================");
+            log.warn("Brevo API Key not configured! Email was NOT sent.");
+            log.warn("Subject: {} | To: {}", subject, toEmail);
+            log.warn("==========================================================================");
+            return;
+        }
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("api-key", brevoApiKey);
+            headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+            Map<String, Object> payload = Map.of(
+                    "sender", Map.of("name", senderName, "email", senderEmail),
+                    "to", List.of(Map.of("email", toEmail)),
+                    "subject", subject,
+                    "htmlContent", htmlContent,
+                    "replyTo", Map.of("email", "no-reply@equinoxos.com", "name", "Equinox OS")
+            );
+
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
+            restTemplate.postForObject(BREVO_API_URL, request, String.class);
+            
+            log.info("Email [{}] sent securely via Brevo to {}", subject, toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send email [{}] via Brevo to {}: {}", subject, toEmail, e.getMessage());
+        }
+    }
 
     @Async
     public void sendPasswordResetEmail(String toEmail, String token) {
@@ -39,31 +79,7 @@ public class EmailService {
                 + "<p>Best regards,<br/>The Equinox OS Team</p>"
                 + "</div>";
 
-        if (mailHost == null || mailHost.isBlank()) {
-            log.warn("==========================================================================");
-            log.warn("SMTP credentials not configured! Email was NOT sent.");
-            log.warn("Password Reset Link for {}: {}", toEmail, resetUrl);
-            log.warn("==========================================================================");
-            return;
-        }
-
-        try {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            
-            helper.setTo(toEmail);
-            helper.setSubject("Equinox OS - Password Reset");
-            helper.setText(htmlMessage, true);
-            
-            // Mask sender and fix avatar overlap by padding the personal name and adding Reply-To
-            helper.setFrom(new InternetAddress("no-reply@equinoxos.com", "Equinox OS \u200C"));
-            helper.setReplyTo("no-reply@equinoxos.com");
-            
-            mailSender.send(mimeMessage);
-            log.info("Password reset HTML email sent securely to {}", toEmail);
-        } catch (Exception e) {
-            log.error("Failed to send password reset email to {}: {}", toEmail, e.getMessage());
-        }
+        sendBrevoEmail(toEmail, "Equinox OS - Password Reset", htmlMessage);
     }
 
     @Async
@@ -79,29 +95,6 @@ public class EmailService {
                 + "<p>Best regards,<br/>The Equinox OS Team</p>"
                 + "</div>";
 
-        if (mailHost == null || mailHost.isBlank()) {
-            log.warn("==========================================================================");
-            log.warn("SMTP credentials not configured! OTP Email was NOT sent.");
-            log.warn("Registration OTP for {}: {}", toEmail, otp);
-            log.warn("==========================================================================");
-            return;
-        }
-
-        try {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            
-            helper.setTo(toEmail);
-            helper.setSubject("Equinox OS - Verification Code");
-            helper.setText(htmlMessage, true);
-            
-            helper.setFrom(new InternetAddress("no-reply@equinoxos.com", "Equinox OS \u200C"));
-            helper.setReplyTo("no-reply@equinoxos.com");
-            
-            mailSender.send(mimeMessage);
-            log.info("Registration OTP email sent securely to {}", toEmail);
-        } catch (Exception e) {
-            log.error("Failed to send registration OTP email to {}: {}", toEmail, e.getMessage());
-        }
+        sendBrevoEmail(toEmail, "Equinox OS - Verification Code", htmlMessage);
     }
 }
