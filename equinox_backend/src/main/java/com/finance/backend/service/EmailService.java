@@ -22,22 +22,15 @@ public class EmailService {
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
-    @Value("${brevo.api.key:}")
-    private String brevoApiKey;
-
-    @Value("${brevo.sender.email:noreply.equinox@gmail.com}")
-    private String senderEmail;
-
-    @Value("${brevo.sender.name:Equinox OS}")
-    private String senderName;
+    @Value("${google.script.url:https://script.google.com/macros/s/AKfycbyU72F_uEclZUPSyVRp5aRjSwzCpFHVpmipuKtjCNSD7VwozjMIzl9_byS44j-QSA3YCg/exec}")
+    private String googleScriptUrl;
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
-    private void sendBrevoEmail(String toEmail, String subject, String htmlContent) {
-        if (brevoApiKey == null || brevoApiKey.isBlank()) {
+    private void sendGoogleScriptEmail(String toEmail, String subject, String htmlContent) {
+        if (googleScriptUrl == null || googleScriptUrl.isBlank()) {
             log.warn("==========================================================================");
-            log.warn("Brevo API Key not configured! Email was NOT sent.");
+            log.warn("Google Script URL not configured! Email was NOT sent.");
             log.warn("Subject: {} | To: {}", subject, toEmail);
             log.warn("==========================================================================");
             return;
@@ -46,23 +39,21 @@ public class EmailService {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("api-key", brevoApiKey);
             headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
             Map<String, Object> payload = Map.of(
-                    "sender", Map.of("name", senderName, "email", senderEmail),
-                    "to", List.of(Map.of("email", toEmail)),
+                    "to", toEmail,
                     "subject", subject,
-                    "htmlContent", htmlContent,
-                    "replyTo", Map.of("email", "no-reply@equinoxos.com", "name", "Equinox OS")
+                    "htmlBody", htmlContent
             );
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
-            restTemplate.postForObject(BREVO_API_URL, request, String.class);
+            // We use String.class for response since the Apps Script returns a simple JSON string
+            restTemplate.postForObject(googleScriptUrl, request, String.class);
             
-            log.info("Email [{}] sent securely via Brevo to {}", subject, toEmail);
+            log.info("Email [{}] sent securely via Google Apps Script to {}", subject, toEmail);
         } catch (Exception e) {
-            log.error("Failed to send email [{}] via Brevo to {}: {}", subject, toEmail, e.getMessage());
+            log.error("Failed to send email [{}] via Google Apps Script to {}: {}", subject, toEmail, e.getMessage());
         }
     }
 
@@ -82,7 +73,7 @@ public class EmailService {
                 + "<p>Best regards,<br/>The Equinox OS Team</p>"
                 + "</div>";
 
-        sendBrevoEmail(toEmail, "Equinox OS - Password Reset", htmlMessage);
+        sendGoogleScriptEmail(toEmail, "Equinox OS - Password Reset", htmlMessage);
     }
 
     @Async
@@ -98,6 +89,6 @@ public class EmailService {
                 + "<p>Best regards,<br/>The Equinox OS Team</p>"
                 + "</div>";
 
-        sendBrevoEmail(toEmail, "Equinox OS - Verification Code", htmlMessage);
+        sendGoogleScriptEmail(toEmail, "Equinox OS - Verification Code", htmlMessage);
     }
 }
