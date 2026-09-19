@@ -24,6 +24,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.finance.backend.exception.custom.ResourceNotFoundException;
+import com.finance.backend.exception.custom.DuplicateResourceException;
+import com.finance.backend.exception.custom.InvalidRequestException;
+import com.finance.backend.exception.custom.UnauthorizedException;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -40,7 +44,7 @@ public class AuthService {
     @Transactional
     public void sendRegistrationOtp(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException("This email address is already registered.");
         }
         
         // Generate 6 digit OTP
@@ -61,22 +65,22 @@ public class AuthService {
     @Transactional
     public UserResponse register(RegisterRequest request){
         if (userRepository.existsByUsername(request.getUsername())){
-            throw new RuntimeException("Username already exists");
+            throw new DuplicateResourceException("This username is already taken. Please choose another one.");
         }
         if (userRepository.existsByEmail(request.getEmail())){
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException("This email address is already registered.");
         }
 
         RegistrationOtp registrationOtp = registrationOtpRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("No OTP requested for this email"));
+                .orElseThrow(() -> new InvalidRequestException("No verification code was requested for this email address."));
                 
         if (registrationOtp.getExpiryDate().before(new Date())) {
             registrationOtpRepository.delete(registrationOtp);
-            throw new RuntimeException("OTP has expired. Please request a new one.");
+            throw new InvalidRequestException("Your verification code has expired. Please request a new one.");
         }
         
         if (!registrationOtp.getOtp().equals(request.getOtp())) {
-            throw new RuntimeException("Invalid OTP");
+            throw new InvalidRequestException("The verification code you entered is incorrect.");
         }
 
         User user = new User();
@@ -100,10 +104,10 @@ public class AuthService {
                         request.getUsername(), request.getPassword())
                 );
                 User user = userRepository.findByUsername(request.getUsername())
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+                        .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
                 if (!user.isActive()) {
-                    throw new RuntimeException("Your account is deactivated. Please contact an admin.");
+                    throw new UnauthorizedException("Your account is deactivated. Please contact support.");
                 }
 
                 String token = jwtUtil.generateToken(user.getUsername(),user.getRole().name());
@@ -123,7 +127,7 @@ public class AuthService {
 
     public void forgotPassword(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("No account found with that email address."));
+                .orElseThrow(() -> new ResourceNotFoundException("No account found with that email address."));
 
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = new PasswordResetToken();
@@ -137,11 +141,11 @@ public class AuthService {
     @Transactional
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid password reset token"));
+                .orElseThrow(() -> new InvalidRequestException("The password reset link is invalid or malformed."));
 
         if (resetToken.getExpiryDate().before(new Date())) {
             passwordResetTokenRepository.delete(resetToken);
-            throw new RuntimeException("Password reset token has expired");
+            throw new InvalidRequestException("Your password reset link has expired. Please request a new one.");
         }
 
         User user = resetToken.getUser();

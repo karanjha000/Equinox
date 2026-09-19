@@ -11,6 +11,8 @@ import com.finance.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.finance.backend.exception.custom.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,7 +32,7 @@ public class BudgetService {
     @Transactional
     public BudgetResponse upsertBudget(BudgetRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         Budget budget = budgetRepository.findByUserIdAndCategory(user.getId(), request.getCategory())
                 .orElse(new Budget());
@@ -44,7 +46,7 @@ public class BudgetService {
 
     public List<BudgetResponse> getAllBudgets(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         return budgetRepository.findByUserId(user.getId()).stream()
                 .map(this::mapToResponse)
@@ -54,13 +56,13 @@ public class BudgetService {
     @Transactional
     public void deleteBudget(Long id, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         Budget budget = budgetRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Budget not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested budget could not be found."));
 
         if (!budget.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Access denied: You do not own this budget");
+            throw new AccessDeniedException("You do not have permission to view or modify this record.");
         }
 
         budgetRepository.delete(budget);
@@ -68,7 +70,7 @@ public class BudgetService {
 
     public List<BudgetProgressResponse> getBudgetProgress(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         List<Budget> budgets = budgetRepository.findByUserId(user.getId());
 

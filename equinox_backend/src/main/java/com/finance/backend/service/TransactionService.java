@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import com.finance.backend.exception.custom.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,7 @@ public class TransactionService {
 
     public TransactionResponse create(TransactionRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         Transaction transaction = new Transaction();
         transaction.setAmount(request.getAmount());
@@ -47,13 +49,13 @@ public class TransactionService {
 
     public TransactionResponse getById(Long id, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         Transaction transaction = transactionRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested transaction could not be found."));
 
         if (user.getRole() != com.finance.backend.enums.Role.ADMIN && !transaction.getCreatedBy().getId().equals(user.getId())) {
-            throw new RuntimeException("Access denied: You do not own this transaction");
+            throw new AccessDeniedException("You do not have permission to view or modify this record.");
         }
 
         return mapToResponse(transaction);
@@ -64,7 +66,7 @@ public class TransactionService {
                                                   LocalDate startDate, LocalDate endDate,
                                                   String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending().and(Sort.by("createdAt").descending()));
 
@@ -75,13 +77,13 @@ public class TransactionService {
 
     public TransactionResponse update(Long id, TransactionRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested transaction could not be found."));
 
         if (user.getRole() != com.finance.backend.enums.Role.ADMIN && !transaction.getCreatedBy().getId().equals(user.getId())) {
-            throw new RuntimeException("Access denied: You do not own this transaction");
+            throw new AccessDeniedException("You do not have permission to view or modify this record.");
         }
 
         transaction.setAmount(request.getAmount());
@@ -95,13 +97,13 @@ public class TransactionService {
 
     public void delete(Long id, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         Transaction transaction = transactionRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested transaction could not be found."));
 
         if (user.getRole() != com.finance.backend.enums.Role.ADMIN && !transaction.getCreatedBy().getId().equals(user.getId())) {
-            throw new RuntimeException("Access denied: You do not own this transaction");
+            throw new AccessDeniedException("You do not have permission to view or modify this record.");
         }
 
         transaction.setDeleted(true);
@@ -110,7 +112,7 @@ public class TransactionService {
 
     public List<TransactionResponse> filterByType(TransactionType type, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         List<Transaction> transactions;
         if (user.getRole() == com.finance.backend.enums.Role.ADMIN) {
@@ -124,7 +126,7 @@ public class TransactionService {
 
     public List<TransactionResponse> filterByCategory(String category, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         List<Transaction> transactions;
         if (user.getRole() == com.finance.backend.enums.Role.ADMIN) {
@@ -138,7 +140,7 @@ public class TransactionService {
 
     public List<TransactionResponse> filterByDateRange(LocalDate start, LocalDate end, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         List<Transaction> transactions;
         if (user.getRole() == com.finance.backend.enums.Role.ADMIN) {
@@ -154,7 +156,7 @@ public class TransactionService {
                                           LocalDate startDate, LocalDate endDate,
                                           String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("The requested user profile could not be found."));
 
         Specification<Transaction> spec = createTransactionSpecification(type, category, startDate, endDate, user);
 
